@@ -1,0 +1,16 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+crcmod = "==1.7"
+pyserial = "==3.4"
+
+
+[dev-packages]
+
+"e1839a8" = {path = ".", editable = true}
