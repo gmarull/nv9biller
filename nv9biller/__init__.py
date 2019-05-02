@@ -202,7 +202,7 @@ class Biller(object):
             raise BillerCommunicationsError('CRC mismatch')
 
         # check for response errors
-        err = pkt[ssp.RESP_FLD]
+        err = unpack('B', pkt[ssp.RESP_FLD])[0]
         if err != ssp.ERR_OK:
             raise BillerCommunicationsError(ssp.ERR_DESC[err])
 
@@ -248,14 +248,14 @@ class Biller(object):
         self._fw_version = s[1:1 + 4].decode('utf8')
 
         # process each channel information
-        n_ch = s[11]
+        n_ch = unpack('B', s[11])[0]
         multiplier = unpack('>I', b'\x00' + s[8:8 + 3])[0]
 
         self._channels = []
 
         for ch in range(n_ch):
             off = 12 + ch
-            value = s[off] * multiplier
+            value = unpack('B', s[off])[0] * multiplier
 
             off = 16 + n_ch * 2 + ch * 3
             currency = s[off:off + 3].decode('utf8')
@@ -338,13 +338,13 @@ class Biller(object):
         events = []
         i = 0
         while i < len(r):
-            code = r[i]
+            code = unpack('B', r[i])[0]
 
             if code in (ssp.EVT_READ,
                         ssp.EVT_CREDIT,
                         ssp.EVT_CLEARED_FRONT,
                         ssp.EVT_CLEARED_CASHBOX):
-                channel = self._channels[r[i + 1] - 1] if r[i + 1] else None
+                channel = self._channels[unpack('B', r[i + 1])[0] - 1] if unpack('B', r[i + 1])[0] else None
                 i += 2
             else:
                 channel = None
